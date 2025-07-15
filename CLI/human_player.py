@@ -22,7 +22,7 @@ class HumanPlayer(GameInterface, ABC):
         self.__hint_limit = 15
         self.__hint_types: list[str] = ["even-odd", "digit-length", "divisible", "multiple", "start-number",
                                         "end-number", "digits-sum", "ascending-descending", "between-x-y",
-                                        "first-second-half", "prime", "square"]
+                                        "first-second-half", "prime", "square", "product"]
 
     def _get_start_number(self) -> None:
         while True:
@@ -103,14 +103,72 @@ class HumanPlayer(GameInterface, ABC):
         self.__hint_limit = 15
         self.__hint_types = ["even-odd", "digit-length", "divisible", "multiple", "start-number", "end-number",
                              "digits-sum", "ascending-descending", "between-x-y", "first-second-half", "prime",
-                             "square"]
+                             "square", "product"]
 
-    def __divisible_and_multiple(self, get_hint_type) -> None:
+    def __hint_divisible_and_multiple(self, get_hint_type) -> None:
         for i in range(2, self.__random_number + 1):
+            if i == self.__random_number:
+                continue
+
             if self.__random_number % i == 0:
-                print(f"\n💡 The Number is {get_hint_type.title()} by {i}")
+                print(f"\n💡 The Number is {get_hint_type.title()} of {i}")
 
                 break
+        else:
+            print(f"\n💡 There is no {get_hint_type.title()} Available")
+
+    def __hint_ascending_descending(self) -> None:
+        __temp: list[int] = [int(i) for i in str(self.__random_number)]
+
+        if all([__temp[i] <= __temp[i + 1] for i in range(len(__temp) - 1)]):
+            print("\n💡 The Digits of the Number is in Ascending Order")
+        elif all([__temp[i] >= __temp[i + 1] for i in range(len(__temp) - 1)]):
+            print("\n💡 The Digits of the Number is in Descending Order")
+        else:
+            print("\n💡 The Digits of the Number is not in any Particular Order")
+
+    def __hint_prime(self) -> None:
+        if self.__random_number <= 1:
+            print(f"\n💡 The Number is Non Prime")
+
+        for i in range(2, int(math.sqrt(self.__random_number)) + 1):
+            if self.__random_number % i == 0:
+                print(f"\n💡 The Number is Non Prime")
+
+                break
+        else:
+            print(f"\n💡 The Number is Prime")
+
+    def __hint_square(self) -> None:
+        for i in range(1, self.__random_number + 1):
+            if i * i == self.__random_number:
+                print(f"\n💡 The Number is a Square of {i}")
+
+                break
+        else:
+            print(f"\n💡 The Number is not a Perfect Square")
+
+    def __hint_product(self) -> None:
+        products: list[int] = []
+
+        for i in range(2, self.__random_number + 1):
+            if i == self.__random_number:
+                continue
+
+            if self.__random_number % i == 0:
+                products.append(i)
+
+        if products:
+            for i in range(len(products)):
+                for j in range(i, len(products)):
+                    if products[i] * products[j] == self.__random_number:
+                        print(f"\n💡 The Products of the Number is {products[i]} and {products[j]}")
+
+                        return
+            else:
+                print(f"\n💡 No Products of this Number Exists")
+        else:
+            print(f"\n💡 No Products of this Number Exists")
 
     def _show_hints(self) -> None:
         if self.__hint_limit > 0:
@@ -122,7 +180,7 @@ class HumanPlayer(GameInterface, ABC):
             elif __get_hint_type.__eq__("digit-length"):
                 print(f"\n💡 It's a {len(str(self.__random_number))} digit's number")
             elif __get_hint_type.__eq__("divisible") or __get_hint_type.__eq__("multiple"):
-                self.__divisible_and_multiple(get_hint_type=__get_hint_type)
+                self.__hint_divisible_and_multiple(get_hint_type=__get_hint_type)
             elif __get_hint_type.__eq__("start-number"):
                 print(f"\n💡 The Number Starts with {str(self.__random_number)[0]}")
             elif __get_hint_type.__eq__("end-number"):
@@ -130,38 +188,18 @@ class HumanPlayer(GameInterface, ABC):
             elif __get_hint_type.__eq__("digits-sum"):
                 print(f"\n💡 The Sum of the Digits is {sum([int(i) for i in str(self.__random_number)])}")
             elif __get_hint_type.__eq__("ascending-descending"):
-                __temp: list[int] = [int(i) for i in str(self.__random_number)]
-
-                if all([__temp[i] <= __temp[i + 1] for i in range(len(__temp) - 1)]):
-                    print("\n💡 The Digits of the Number is in Ascending Order")
-                elif all([__temp[i] >= __temp[i + 1] for i in range(len(__temp) - 1)]):
-                    print("\n💡 The Digits of the Number is in Descending Order")
-                else:
-                    print("\n💡 The Digits of the Number is not in any Particular Order")
+                self.__hint_ascending_descending()
             elif __get_hint_type.__eq__("between-x-y"):
                 print(f"\n💡 The Number is in Between {self.__random_number - 15} and {self.__random_number + 16}")
             elif __get_hint_type.__eq__("first-second-half"):
-                print(
-                    f"\n💡 The Number Lies in {'First' if self.__random_number <= (self.__end_number / 2) else 'Second'} Half")
+                print(f"\n💡 The Number Lies in "
+                      f"{'First' if self.__random_number <= (self.__end_number / 2) else 'Second'} Half")
             elif __get_hint_type.__eq__("prime"):
-                if self.__random_number <= 1:
-                    print(f"\n💡 The Number is Non Prime")
-
-                for i in range(2, int(math.sqrt(self.__random_number)) + 1):
-                    if self.__random_number % i == 0:
-                        print(f"\n💡 The Number is Non Prime")
-
-                        break
-                else:
-                    print(f"\n💡 The Number is Prime")
+                self.__hint_prime()
             elif __get_hint_type.__eq__("square"):
-                for i in range(1, self.__random_number + 1):
-                    if self.__random_number < i * i:
-                        print("\n💡 The Number is Not a Perfect Square")
-
-                        break
-                else:
-                    print(f"\n💡 The Number is a Perfect Square of {i}")
+                self.__hint_square()
+            elif __get_hint_type.__eq__("product"):
+                self.__hint_product()
 
             self.__hint_types.remove(__get_hint_type)
 
